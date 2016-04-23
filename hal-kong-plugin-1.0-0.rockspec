@@ -6,14 +6,11 @@ source = {
   tag = "1.0.0"
 }
 description = {
-  summary = "The Kong JWT-Upstream plugin.",
+  summary = "The Kong HAL plugin.",
   license = "MIT",
   homepage = "http://www.trust1team.com",
   detailed = [[
-      The JWT upstream plugin composed an JWT that will be sent implicitly to
-      all upstream APIs in the Authorization header (Bearer token).
-      The consuming application must have JWT credentials, and must be identified
-      towards the API in order for the plugin to generate the token.
+      The HAL plugin rewrites currie-values from hal/json bodies.
   ]],
 }
 dependencies = {
@@ -22,8 +19,8 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
-    ["kong.plugins.jwt-up.handler"] = "src/handler.lua",
-    ["kong.plugins.jwt-up.schema"] = "src/schema.lua",
-    ["kong.plugins.jwt-up.jwt_parser"] = "src/jwt_parser.lua"
+    ["kong.plugins.hal.handler"] = "src/handler.lua",
+    ["kong.plugins.hal.schema"] = "src/schema.lua",
+    ["kong.plugins.hal.body_filter"] = "src/body_filter.lua"
   }
 }

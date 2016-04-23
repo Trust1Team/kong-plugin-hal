@@ -1,6 +1,5 @@
 return {
-  no_consumer = true, -- this plugin will only be API-wide,
+  no_consumer = true,
   fields = {
-    -- Describe your plugin's configuration's schema here.
   }
 }
