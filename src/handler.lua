@@ -73,7 +73,7 @@ end
 ---------------------------
 
 function HalHandler:new()
-	HalHandler.super.new(self, "hal-kong-plugin")
+	HalHandler.super.new(self, "hal")
 end
 
 function HalHandler:header_filter(config)
