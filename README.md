@@ -20,7 +20,7 @@ The HAL plugin has been developed to support currie-rewriting for HAL bodies.
 
 ## Summary
 
-TBD
+The HAL plugin rewrites currie-values from hal/json bodies.
 
 ## Roadmap
 
