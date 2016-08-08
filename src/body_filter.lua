@@ -4,17 +4,16 @@ local cjson = require "cjson"
 
 local BodyFilter = {}
 
------------------------ 
+-----------------------
 -- Utility functions --
 -----------------------
-
 local function to_json(body)
-    local status, res = pcall(cjson.decode, body)
-    if status then
-      return res
-    end
+	local status, res = pcall(cjson.decode, body)
+	if status then
+		return res
+	end
 
-    return nil
+	return nil
 end
 
 local function remove_ending_slash(url)
@@ -28,50 +27,59 @@ local function remove_ending_slash(url)
 end
 
 local function escape_pattern(pattern)
-  local matches =
-  {
-    ["^"] = "%^";
-    ["$"] = "%$";
-    ["("] = "%(";
-    [")"] = "%)";
-    ["%"] = "%%";
-    ["."] = "%.";
-    ["["] = "%[";
-    ["]"] = "%]";
-    ["*"] = "%*";
-    ["+"] = "%+";
-    ["-"] = "%-";
-    ["?"] = "%?";
-  }
+	local matches =
+	{
+		["^"] = "%^";
+		["$"] = "%$";
+		["("] = "%(";
+		[")"] = "%)";
+		["%"] = "%%";
+		["."] = "%.";
+		["["] = "%[";
+		["]"] = "%]";
+		["*"] = "%*";
+		["+"] = "%+";
+		["-"] = "%-";
+		["?"] = "%?";
+	}
 
-  return string.gsub(pattern, ".", matches)
+	return string.gsub(pattern, ".", matches)
 end
 
-local function replace_url(json, upstream_url, downstream_url) 
-  	if utils.table_size(json) > 0 then
-    		for key, value in pairs(json) do
-			if type(value) == "table" then
-				json[key] = replace_url(value, upstream_url, downstream_url)
-			else
-				json[key] = string.gsub(value, upstream_url, downstream_url)
-			end
-    		end
-  	end
-
+local function replace_url(json,upstream_url,downstream_url)
+	rReplace(nil,nil,json,nil,upstream_url,downstream_url)
 	return json
+end
+
+function rReplace(s, k, v, l,upstream_url,downstream_url) -- recursive Replace (structure, limit, up, down)
+l = (l) or 100; i = i or "";	-- default item limit, indent string
+if (l<1) then ngx.log(ngx.DEBUG,"ERROR: Item limit reached."); return l-1 end; -- stop condition
+local ts = type(v); -- value type
+if (ts ~= "table") then
+	ngx.log(ngx.DEBUG,v)
+	if (ts == "string") then
+		s[k] = string.gsub(v,upstream_url,downstream_url)
+		ngx.log(ngx.DEBUG,"replaced: " .. v)
+	end
+	return l-1
+end
+for k,s in pairs(v) do
+	l = rReplace(v, k, s, l,upstream_url,downstream_url); -- recursive step
+	if (l < 0) then break end
+end
+return l
 end
 
 ---------------------------
 -- Filter implementation --
 ---------------------------
-
 function BodyFilter.execute(body, upstream_url, downstream_url)
 	if upstream_url and downstream_url then
 		local json_body = to_json(body)
 		if json_body then
-			return cjson.encode(replace_url(json_body, escape_pattern(remove_ending_slash(upstream_url)), remove_ending_slash(downstream_url)))
+			--return cjson.encode(replace_url(json_body, escape_pattern(remove_ending_slash(upstream_url)), remove_ending_slash(downstream_url)))
+			return cjson.encode(replace_url(json_body, remove_ending_slash(upstream_url), remove_ending_slash(downstream_url)))
 		end
-
 	end
 
 	return body
