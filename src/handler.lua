@@ -53,17 +53,15 @@ end
 
 local function get_downstream_url()
     local api = ngx.ctx.api
-    if api.request_host then
-        return api.request_host
+--[[    for k, v in pairs( api ) do
+        ngx.log(ngx.DEBUG, "NGINX context api:" .. k .. "[".. tostring(v) .."]")
     end
+    ngx.log(ngx.DEBUG,"---->>" ..  ngx.var.scheme.."://"..ngx.var.host..":"..ngx.var.server_port..ngx.var.request_uri]]
+
     if api.request_path then
         local request_uri = ngx.var.scheme.."://"..ngx.var.host..":"..ngx.var.server_port..ngx.var.request_uri
-        local start, stop = string.find(request_uri, api.request_path)
-        if stop then
-            return string.sub(request_uri, 0, stop)
-        end
+        return request_uri
     end
-
     return nil
 end
 
@@ -77,23 +75,26 @@ end
 
 function HalHandler:header_filter(config)
     HalHandler.super.header_filter(self)
-
     -- Clear the content length header if the content type is hal+json, because we might change the body.
-    local is_hal_json = stringy.startswith(get_content_type(), APPLICATION_HAL_JSON)
-    if is_hal_json then
-        ngx.header[CONTENT_LENGTH] = nil
+    if get_content_type() then
+        local is_hal_json = stringy.startswith(get_content_type(), APPLICATION_HAL_JSON)
+        if is_hal_json then
+            ngx.header[CONTENT_LENGTH] = nil
+        end
     end
 end
 
 function HalHandler:body_filter(config)
     HalHandler.super.body_filter(self)
-    local is_hal_json = stringy.startswith(get_content_type(), APPLICATION_HAL_JSON)
-    if is_hal_json then
-        local body = read_response_body()
-        ngx.log(ngx.DEBUG, "Upstream url:" .. get_upstream_url())
-        ngx.log(ngx.DEBUG, "Downstream url:" .. get_downstream_url())
-        if body then
-            ngx.arg[1] = body_filter.execute(body, get_upstream_url(), get_downstream_url())
+    if get_content_type() then
+        local is_hal_json = stringy.startswith(get_content_type(), APPLICATION_HAL_JSON)
+        if is_hal_json then
+            local body = read_response_body()
+            ngx.log(ngx.DEBUG, "Upstream url:" .. get_upstream_url())
+            ngx.log(ngx.DEBUG, "Downstream url:" .. get_downstream_url())
+            if body then
+                ngx.arg[1] = body_filter.execute(body, get_upstream_url(), get_downstream_url())
+            end
         end
     end
 end
