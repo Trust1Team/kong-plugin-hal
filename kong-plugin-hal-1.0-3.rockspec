@@ -1,9 +1,9 @@
 package = "kong-plugin-hal"
-version = "1.0-2"
+version = "1.0-3"
 supported_platforms = {"linux", "macosx"}
 source = {
   url = "git://github.com/Trust1Team/kong-plugin-hal",
-  tag = "1.0.2"
+  tag = "1.0.3"
 }
 description = {
   summary = "The Kong HAL plugin.",
