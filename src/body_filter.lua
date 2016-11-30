@@ -46,8 +46,12 @@ local function escape_pattern(pattern)
 	return string.gsub(pattern, ".", matches)
 end
 
+local function escape_replacement(replacement)
+	return string.gsub(replacement, "[%%]", "%%%%")
+end
+
 local function replace_url(json,upstream_url,downstream_url)
-	rReplace(nil,nil,json,nil,upstream_url,downstream_url)
+	rReplace(nil,nil,json,nil,escape_pattern(upstream_url),escape_replacement(downstream_url))
 	return json
 end
 
