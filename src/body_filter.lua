@@ -51,7 +51,7 @@ local function escape_replacement(replacement)
 end
 
 local function replace_url(json,upstream_url,downstream_url)
-	rReplace(nil,nil,json,nil,escape_pattern(upstream_url),escape_replacement(downstream_url))
+	rReplace(nil,nil,json,nil,upstream_url,downstream_url)
 	return json
 end
 
@@ -81,7 +81,7 @@ function BodyFilter.execute(body, upstream_url, downstream_url)
 	if upstream_url and downstream_url then
 		local json_body = to_json(body)
 		if json_body then
-			return cjson.encode(replace_url(json_body, remove_ending_slash(upstream_url), remove_ending_slash(downstream_url)))
+			return cjson.encode(replace_url(json_body, remove_ending_slash(escape_pattern(upstream_url)), remove_ending_slash(escape_replacement(downstream_url))))
 		end
 	end
 
