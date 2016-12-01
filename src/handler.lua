@@ -59,7 +59,7 @@ local function get_downstream_url()
     ngx.log(ngx.DEBUG,"---->>" ..  ngx.var.scheme.."://"..ngx.var.host..":"..ngx.var.server_port..ngx.var.request_uri]]
 
     if api.request_path then
-        local request_uri = ngx.var.scheme.."://"..ngx.var.host..":"..ngx.var.server_port..ngx.var.request_uri
+        local request_uri = ngx.var.scheme.."://"..ngx.var.host..":"..ngx.var.server_port..api.request_path
         return request_uri
     end
     return nil
