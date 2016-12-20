@@ -1,6 +1,6 @@
 local utils = require "kong.tools.utils"
 local stringy = require "stringy"
-local cjson = require "cjson"
+local dkjson = require ("dkjson")
 
 local BodyFilter = {}
 
@@ -8,7 +8,7 @@ local BodyFilter = {}
 -- Utility functions --
 -----------------------
 local function to_json(body)
-	local status, res = pcall(cjson.decode, body)
+	local status, res = pcall(dkjson.decode, body)
 	if status then
 		return res
 	end
@@ -81,7 +81,7 @@ function BodyFilter.execute(body, upstream_url, downstream_url)
 	if upstream_url and downstream_url then
 		local json_body = to_json(body)
 		if json_body then
-			return cjson.encode(replace_url(json_body, remove_ending_slash(escape_pattern(upstream_url)), remove_ending_slash(escape_replacement(downstream_url))))
+			return dkjson.encode(replace_url(json_body, remove_ending_slash(escape_pattern(upstream_url)), remove_ending_slash(escape_replacement(downstream_url))), { indent = true })
 		end
 	end
 
