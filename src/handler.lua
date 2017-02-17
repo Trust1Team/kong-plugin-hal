@@ -3,6 +3,10 @@ local stringy = require "stringy"
 local BasePlugin = require "kong.plugins.base_plugin"
 local body_filter = require "kong.plugins.hal.body_filter"
 
+-- PC : 20170217 : Begin
+local url = require "url"
+-- PC : 20170217 : End
+
 local HalHandler = BasePlugin:extend()
 
 ---------------
@@ -48,7 +52,24 @@ local function read_response_body()
 end
 
 local function get_upstream_url()
-    return ngx.ctx.api.upstream_url
+    -- return ngx.ctx.api.upstream_url
+    -- Bart VS : return string.gsub(ngx.ctx.api.upstream_url,"https://(.*)/(.*)","https://%1:443/%2");
+
+-- PC : 20170207 : Begin
+-- Kong (v0.9.3) adds the default https port (443) to URL when there is no port defined, so the original upstream is no longer comparable if it doesn't contain a port
+-- see also https://github.com/Mashape/kong/issues/869
+
+   local upstream_url = ngx.ctx.api.upstream_url
+   local upstream_url_parts = url.parse(upstream_url)
+   if upstream_url_parts.scheme == "https" and not upstream_url_parts.port then
+      upstream_url = "https://" .. upstream_url_parts.host .. ":443" .. upstream_url_parts.path
+      if tostring(upstream_url_parts.query) ~= "" then
+         upstream_url= upstream_url .. "?" .. tostring(upstream_url_parts.query)
+      end
+   end
+   return upstream_url
+-- PC : 20170207 : End
+
 end
 
 local function get_downstream_url()
