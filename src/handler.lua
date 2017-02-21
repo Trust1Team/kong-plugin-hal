@@ -4,7 +4,7 @@ local BasePlugin = require "kong.plugins.base_plugin"
 local body_filter = require "kong.plugins.hal.body_filter"
 
 -- PC : 20170217 : Begin
-local url = require "url"
+local url = require "kong.plugins.hal.url"
 -- PC : 20170217 : End
 
 local HalHandler = BasePlugin:extend()
@@ -51,14 +51,18 @@ local function read_response_body()
     return nil
 end
 
+--- Function which returns a Kong compliant upstream URL.
+-- This function returns a Kong compliant upstream URL. 
+-- When https protocol is used and no port is defined, Kong (v0.9.3) adds port 443 to the URL; 
+-- therefore this function will have to do the same in order to be able to make comparisons.
+-- see also : https://github.com/Mashape/kong/issues/869
+-- @function get_upstream_url
+-- @return kong compliant upstream URL
 local function get_upstream_url()
     -- return ngx.ctx.api.upstream_url
     -- Bart VS : return string.gsub(ngx.ctx.api.upstream_url,"https://(.*)/(.*)","https://%1:443/%2");
 
 -- PC : 20170207 : Begin
--- Kong (v0.9.3) adds the default https port (443) to URL when there is no port defined, so the original upstream is no longer comparable if it doesn't contain a port
--- see also https://github.com/Mashape/kong/issues/869
-
    local upstream_url = ngx.ctx.api.upstream_url
    local upstream_url_parts = url.parse(upstream_url)
    if upstream_url_parts.scheme == "https" and not upstream_url_parts.port then
@@ -71,6 +75,7 @@ local function get_upstream_url()
 -- PC : 20170207 : End
 
 end
+
 
 local function get_downstream_url()
     local api = ngx.ctx.api
