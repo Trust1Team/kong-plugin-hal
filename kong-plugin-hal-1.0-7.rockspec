@@ -1,9 +1,9 @@
 package = "kong-plugin-hal"
-version = "1.0-6"
+version = "1.0-7"
 supported_platforms = {"linux", "macosx"}
 source = {
   url = "git://github.com/Trust1Team/kong-plugin-hal",
-  tag = "1.0.6"
+  tag = "1.0.7"
 }
 description = {
   summary = "The Kong HAL plugin.",
@@ -22,7 +22,7 @@ build = {
   modules = {
     ["kong.plugins.hal.handler"] = "src/handler.lua",
     ["kong.plugins.hal.schema"] = "src/schema.lua",
-    ["kong.plugins.hal.schema"] = "src/url.lua",
+    ["kong.plugins.hal.url"] = "src/url.lua",
     ["kong.plugins.hal.body_filter"] = "src/body_filter.lua"
   }
 }
